@@ -1,3 +1,7 @@
+//SCHEMA DEFINITION
+//IF A LISTING IS DELETED THEN ALL ITS REVIEWS MUST ALSO GET DELETED
+
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema //connect 
 const Review=require("./review.js");

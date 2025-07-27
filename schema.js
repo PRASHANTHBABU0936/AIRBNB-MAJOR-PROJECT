@@ -1,3 +1,7 @@
+// #Validating API inputs – Ensures data coming from client (body, query, params) is correct.
+// Reduces boilerplate code – Instead of writing many if checks, Joi provides a simple schema-based way.
+// Prevents invalid data – Avoids wrong data from being processed or saved in a database.
+
 const Joi=require('joi');
 module.exports.listingSchema = Joi.object({
     listing : Joi.object({
