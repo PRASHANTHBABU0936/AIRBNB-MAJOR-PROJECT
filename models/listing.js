@@ -5,6 +5,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema //connect 
 const Review=require("./review.js");
+const { required } = require("joi");
 const listingSchema = new Schema({ //connect 
     title:{
         type:String,
@@ -27,12 +28,25 @@ image:{
     owner:{
         type:Schema.Types.ObjectId,
         ref:"User",
-    }
+    },
+    geometry:{
+ type:{
+        type:String,
+        enum:["Point"],
+        required:true,
+    },
+        coordinates:{
+        type:[Number],
+        required:true,
+    },
+ }   
+}
+
     // category:{
     //     type:String,
     //     enum:["mountains",'arctic','farms','deserts']
     // }
-});
+);
 
 //if any listing ius get deleteed then all its reviews should be get deleted
 

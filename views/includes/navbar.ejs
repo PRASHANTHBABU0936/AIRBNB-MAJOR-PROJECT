@@ -34,10 +34,24 @@ margin-right: 0.5rem;
         <!-- <a class="nav-link disabled" aria-disabled="true">Disabled</a> -->
       </div>
       <div class="navbar-nav ms-auto">
-       <form class="d-flex" role="search">
+
+        <form class="d-flex" role="search" action="/listings/search" method="GET">
+  <input
+    class="form-control me-2"
+    type="search"
+    name="q"
+    placeholder="Search destination"
+    required
+  />
+  <button class="btn btn-search" type="submit">
+    <i class="fas fa-search"></i> Search
+  </button>
+</form>
+
+       <!-- <form class="d-flex" role="search">
       <input class="form-control me-2" type="search" placeholder="Search destination" />
       <button class="btn btn-search" type="submit"><i class="fas fa-search"></i>Search</button>
-    </form> 
+    </form>  -->
       </div>
     </div>
 

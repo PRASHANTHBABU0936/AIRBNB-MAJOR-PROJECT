@@ -72,7 +72,7 @@ app.use(express.static(path.join(__dirname,"/public")));
 const store = MongoStore.create({
     mongoUrl: dbUrl, 
     crypto:{
-        secret:"process.env.SECRET",
+        secret:process.env.SECRET,
     },
 touchAfter:24*3600
 });
@@ -83,7 +83,7 @@ store.on("error",()=>{
 const sessionOptions = {
   // secret: process.env.SECRET,
    store,
-  secret: "process.env.SECRET",
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -105,18 +105,38 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+    res.locals.currUser = req.user; // or wherever you're storing the user after login
+    next();
+});
+
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use((req,res,next) => {
+// app.use((req, res, next) => {
+//     res.locals.currUser = req.user;  // assuming you're using Passport and req.user is available
+//     next();
+// });
+
+
+// app.use((req,res,next) => {
+//     res.locals.success = req.flash("success");
+//     res.locals.error=req.flash("error");
+//     res.locals.currUser=req.user;
+//     // console.log(res.locals.success);
+//     next();
+// })
+
+
+app.use((req, res, next) => {
+    res.locals.currUser = req.user;
     res.locals.success = req.flash("success");
-    res.locals.error=req.flash("error");
-    res.locals.currUser=req.user;
-    // console.log(res.locals.success);
+    res.locals.error = req.flash("error");
     next();
-})
+});
+
 
 // app.get("/demouser",async (req,res) => {
 //     let fakeUser=new User({
@@ -130,8 +150,9 @@ app.use((req,res,next) => {
 
 
 
-app.use("/listings",listingRouter);
-app.use("/listings/:id/reviews",reviewRouter);
+app.use("/listings/:id/reviews", reviewRouter);
+app.use("/listings", listingRouter); // put this AFTER reviews
+
 app.use("/",userRouter);
 
 // app.get("/testListing",async(req,res) => {
@@ -172,10 +193,17 @@ app.use((err, req, res, next) => {
 });
 
 
-const server = app.listen(0, () => {
-    const port = server.address().port;
-    console.log(`Server is listening on random port ${port}`);
+const port = process.env.PORT || 8000;
+app.listen(port, () => {
+    console.log(`✅ Server running at http://localhost:${port}`);
 });
+
+// app.listen(0, () => {
+//   const address = app.address();
+//   console.log(`✅ Server started on http://localhost:${address.port}`);
+// });
+
+
 
 
 // const PORT = 0; 

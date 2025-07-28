@@ -21,6 +21,20 @@ const validateListing = (req, res, next) => {
     next();
   }
 };
+router.get("/search", wrapAsync(async (req, res) => {
+  const { q } = req.query;
+  const listings = await Listing.find({
+    $or: [
+      { title: new RegExp(q, 'i') },
+      { location: new RegExp(q, 'i') }
+    ]
+  });
+
+  // res.render("listings/index", { listings });
+  res.render("listings/index", { allListings: listings });
+
+}));
+
 const listingController = require("../controllers/listing.js");
 
 router
@@ -34,6 +48,10 @@ router
 
 //NEWROUTE
 router.get("/new", isLoggedIn, listingController.renderNewForm);
+
+
+
+
 
 router
   .route("/:id")
@@ -80,5 +98,7 @@ router.get(
 
 //delete route
 // router.delete("/:id", isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
+// 🔍 SEARCH ROUTE — Add this at the end
+
 
 module.exports = router;

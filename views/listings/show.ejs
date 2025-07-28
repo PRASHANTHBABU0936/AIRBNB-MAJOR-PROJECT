@@ -1,4 +1,8 @@
 <% layout("layouts/boilerplate") -%>  
+<script>
+  const mapToken="<%= process.env.MAP_TOKEN %>";
+const coordinates = <%- JSON.stringify(listing.geometry?.coordinates || [77.2090, 28.6139]) %>;
+</script>
 <div class="row mt-3">
   <div class="col-8 offset-2">
     <h3><%= listing.title %></h3>
@@ -39,8 +43,9 @@
 </div>
 
 <div class="col-8 offset-3 mb-3">
-  <hr/>
+  
    <% if(currUser){ %>
+    <hr/>
   <h4>Leave a Review</h4>
   <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
 <!-- <div class="mb-3 mt-3">
@@ -73,9 +78,10 @@
 <button class="btn btn-outline-dark">Submit</button>
   </form>
   <% } %>
-<p>All reviews</p>
+<% if(listing.reviews.length){ %>
 
 <div class="row">
+  <p>All reviews</p>
   <% for (let review of listing.reviews) { %>
 <div class="card col-5 ms-3 mb-3">
 <div class="card-body">
@@ -89,10 +95,28 @@
 
 </div>    <%} %>
 </div>
-<div class="col-8 offset-3 mb-3">
+<% } %>
+
+</div>
+ <div class="col-8 offset-3 mb-3">
 <h3>Where you will be?</h3>
-<div is="map"></div>
+<div id="map"></div>
 </div>
 </div>
- 
-</div>
+
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+
+<script src="/js/map.js"></script>
+
+
+<style>#map {
+  width: 100%;
+  height: 500px;  /* Change to a larger height */
+  border-radius: 8px;  /* optional for rounded corners */
+}
+
+</style>
+
+

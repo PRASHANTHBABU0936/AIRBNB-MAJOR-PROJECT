@@ -12,6 +12,6 @@ mongoose.connect("mongodb://localhost:27017/wanderlust") // correct DB
     mongoose.connection.close();
   })
   .catch((err) => {
-    console.error("❌ Error restoring listings:", err);
+    console.error(" Error restoring listings:", err);
     mongoose.connection.close();
   });

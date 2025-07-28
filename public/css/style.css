@@ -113,3 +113,9 @@ object-fit: cover !important;
   padding-left: 0;
   padding-right: 0;
 }
+
+#map{
+  height: 100px;
+  width: 80vh;
+  
+}

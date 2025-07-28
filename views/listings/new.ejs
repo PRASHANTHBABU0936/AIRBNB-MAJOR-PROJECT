@@ -90,5 +90,16 @@
       <button class="btn btn-dark add-btn mt-3">Add</button>
       <br /><br />
     </form>
+    <!-- added -->
+    <script>
+  const form = document.querySelector("form");
+  const button = document.querySelector(".add-btn");
+
+  form.addEventListener("submit", () => {
+    // Disable button to prevent multiple clicks
+    button.disabled = true;
+    button.innerText = "Submitting...";
+  });
+</script>
   </div>
 </div>
