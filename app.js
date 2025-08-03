@@ -222,11 +222,16 @@ const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
 app.use(bookingsRoutes);
 
 
+const PORT = 8000; // commonly used
 
-const PORT = 0; 
-const server = app.listen(PORT, () => {
-    const actualPort = server.address().port;
-    console.log(`Server is listening on port ${actualPort}`);
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
+
+// const PORT = 0; 
+// const server = app.listen(PORT, () => {
+//     const actualPort = server.address().port;
+//     console.log(`Server is listening on port ${actualPort}`);
+// });
 
 console.log(dbUrl);
