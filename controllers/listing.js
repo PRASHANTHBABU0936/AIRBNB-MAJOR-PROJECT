@@ -1,4 +1,4 @@
-const Listing=require("../models/listing");
+// const Listi/ng=require("../models/listing");
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({accessToken:mapToken});
@@ -16,22 +16,45 @@ module.exports.index = async (req, res) => {
 module.exports.renderNewForm=(req,res)=>{
 res.render("listings/new.ejs");
 }
-module.exports.showListing=async (req, res) => {
+const Listing = require("../models/listing");
+
+// In controllers/listing.js
+module.exports.showListing = async (req, res) => {
   const { id } = req.params;
+  const { bookedDate } = req.query;
+
   const listing = await Listing.findById(id)
+    .populate("owner")
     .populate({
-      path: "reviews",
-      populate: { path: "author" }  
-    })
-    .populate("owner");
+      path: "bookings",
+      populate: { path: "user" }
+    });
 
   if (!listing) {
     req.flash("error", "Listing not found");
     return res.redirect("/listings");
   }
 
-  res.render("listings/show.ejs", { listing });
+  res.render("listings/show", { listing, bookedDate, currUser: req.user });
 };
+
+
+// module.exports.showListing=async (req, res) => {
+//   const { id } = req.params;
+//   const listing = await Listing.findById(id)
+//     .populate({
+//       path: "reviews",
+//       populate: { path: "author" }  
+//     })
+//     .populate("owner");
+
+//   if (!listing) {
+//     req.flash("error", "Listing not found");
+//     return res.redirect("/listings");
+//   }
+
+//   res.render("listings/show.ejs", { listing });
+// };
 module.exports.createListing=async (req, res, next) => {
  let response=await geocodingClient.forwardGeocode({
   query: req.body.listing.location,

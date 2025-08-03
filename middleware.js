@@ -12,14 +12,63 @@ const validateReview = (req, res, next) => {
   next();
 };
 
+// const isLoggedIn = (req, res, next) => {
+//   if (!req.isAuthenticated()) {
+//     req.session.redirectUrl = req.originalUrl;
+//     req.flash("error", "you must be logged in to create listing");
+//     return res.redirect("/login");
+//   }
+//   next();
+// };
+
+// const isLoggedIn = (req, res, next) => {
+//   if (!req.isAuthenticated()) {
+//     // Handle AJAX request (fetch)
+//     if (req.xhr || req.headers.accept.includes('json')) {
+//       return res.status(401).json({ error: 'You must be logged in to book' });
+//     }
+
+//     // Handle normal page request
+//     req.session.redirectUrl = req.originalUrl;
+//     req.flash("error", "You must be logged in to create listing");
+//     return res.redirect("/login");
+//   }
+//   next();
+// };
+
+
+
+
+// const isLoggedIn = (req, res, next) => {
+//   if (req.isAuthenticated && req.isAuthenticated()) {
+//     return next(); // user is logged in
+//   }
+
+//   // Detect if request is AJAX/fetch
+//   const wantsJSON = req.xhr || req.headers.accept?.includes("json");
+
+//   if (wantsJSON) {
+//     return res.status(401).json({ error: "You must be logged in to book." });
+//   }
+
+//   return res.redirect("/login");
+// };
 const isLoggedIn = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    req.session.redirectUrl = req.originalUrl;
-    req.flash("error", "you must be logged in to create listing");
-    return res.redirect("/login");
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      return res.status(401).json({ error: 'You must be logged in to book.' });
+    } else {
+      return res.redirect('/login');
+    }
   }
   next();
 };
+
+
+
+
+
+
 
 const saveRedirectUrl = (req, res, next) => {
   if (req.session.redirectUrl) {

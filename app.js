@@ -29,6 +29,8 @@ const User=require("./models/user.js");
 const listingRouter=require("./routes/listing.js");
 const reviewRouter=require("./routes/review.js");
 const userRouter=require("./routes/user.js");
+
+
 // const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl = process.env.ATLASDB_URL;
 // console.log("MONGO_URI =>", dbUrl);
@@ -193,23 +195,38 @@ app.use((err, req, res, next) => {
 });
 
 
-const port = process.env.PORT || 8000;
-app.listen(port, () => {
-    console.log(`✅ Server running at http://localhost:${port}`);
+// const port = process.env.PORT || 5000;
+// app.listen(port, () => {
+//     console.log(`✅ Server running at http://localhost:${port}`);
+// });
+// const bookingRoutes = require('./routes/bookings');
+// app.use("/bookings", bookingRoutes);
+
+// const bookingRoutes = require("./routes/bookings");
+
+// // Add after other routes
+// app.use("/listings", bookingRoutes);
+
+// make sure you have this
+// app.js or main file
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.bookedDate = req.flash('bookedDate');
+  res.locals.currUser = req.user; // if you're using passport
+  next();
 });
 
-// app.listen(0, () => {
-//   const address = app.address();
-//   console.log(`✅ Server started on http://localhost:${address.port}`);
-// });
+const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
+app.use(bookingsRoutes);
 
 
 
-
-// const PORT = 0; 
-// const server = app.listen(PORT, () => {
-//     const actualPort = server.address().port;
-//     console.log(`Server is listening on port ${actualPort}`);
-// });
+const PORT = 0; 
+const server = app.listen(PORT, () => {
+    const actualPort = server.address().port;
+    console.log(`Server is listening on port ${actualPort}`);
+});
 
 console.log(dbUrl);
