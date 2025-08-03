@@ -51,6 +51,7 @@
     <h3><%= listing.title %></h3>
   </div>
 
+
   <div class="card col-6 offset-3 show-card listing-card">
     <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing_image">
     <div class="card-body">
@@ -123,16 +124,71 @@
       <button class="btn btn-dark offset-5">Delete</button>
     </form>
   </div>
+<div class="col-8 offset-3 mb-3">
 
-  <div class="col-8 offset-3 mb-3">
-    <% if(currUser){ %>
-      <hr/>
-      <h4>Leave a Review</h4>
-      <!-- review form... -->
-    <% } %>
+  <% if (currUser) { %>
+    <hr/>
+    <h4>Leave a Review</h4>
+    <form action="/listings/<%= listing._id %>/reviews" method="POST">
+      <div class="mb-3">
+        <label for="rating" class="form-label">Rating</label>
+        <select class="form-select" name="review[rating]" required>
+          <option disabled selected>Select a rating</option>
+          <option value="1">★☆☆☆☆</option>
+          <option value="2">★★☆☆☆</option>
+          <option value="3">★★★☆☆</option>
+          <option value="4">★★★★☆</option>
+          <option value="5">★★★★★</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="comment" class="form-label">Comment</label>
+        <textarea class="form-control" name="review[comment]" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-success">Submit Review</button>
+    </form>
+  <% } else { %>
+    <hr/>
+    <p class="text-muted">Log in to leave a review.</p>
+  <% } %>
+
+  <h3 class="mt-4">Reviews</h3>
+<% if (listing.reviews.length === 0) { %>
+  <p class="text-muted">No reviews yet.</p>
+<% } else { %>
+  <% for (let review of listing.reviews) { %>
+    <div class="card mb-2 p-2">
+      <!-- Show stars -->
+      <div class="text-warning">
+        <% for (let i = 0; i < review.rating; i++) { %>
+          ★
+        <% } %>
+        <% for (let i = review.rating; i < 5; i++) { %>
+          ☆
+        <% } %>
+      </div>
+
+      <!-- Comment and username -->
+      <p><%= review.comment %></p>
+      <small>— by <%= review.author?.username || 'Anonymous' %></small>
+
+      <% if (currUser && review.author && review.author._id.toString() === currUser._id.toString()) { %>
+        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+          <button class="btn btn-sm btn-danger mt-1">Delete</button>
+        </form>
+      <% } %>
+    </div>
+  <% } %>
+<% } %>
+
+
+  <button type="submit" class="btn btn-success">Submit Review</button>
+</form>
+
+    
 
     <% if(listing.reviews.length){ %>
-      <!-- reviews rendering... -->
+
     <% } %>
   </div>
 

@@ -1,6 +1,21 @@
 /* body{
     background-color: pink;
 } */
+ @media (max-width: 768px) {
+  .card {
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+}
+
  .navbar{
     height: 5rem;
     background-color: white;
