@@ -1,6 +1,5 @@
 if(process.env.NODE_ENV != "production"){
 require('dotenv').config();
-
 }
  //key value pairs
 // console.log(process.env.SECRET);
@@ -222,11 +221,11 @@ const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
 app.use(bookingsRoutes);
 
 
-// const PORT = 6000; 
+const PORT = 6000; 
 
-// app.listen(PORT, () => {
-//   console.log(`✅ Server is running on http://localhost:${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on http://localhost:${PORT}`);
+});
 // app.all("*",(req,res,next) => {
   
 //     next(new ExpressError(404,"Page Not Found!"));
@@ -236,10 +235,10 @@ app.use(bookingsRoutes);
 //     res.send("✅ Payment successful! Thank you.");
 // });
 
-const PORT = 0; 
-const server = app.listen(PORT, () => {
-    const actualPort = server.address().port;
-    console.log(`Server is listening on port ${actualPort}`);
-});
+// const PORT = 0; 
+// const server = app.listen(PORT, () => {
+//     const actualPort = server.address().port;
+//     console.log(`Server is listening on port ${actualPort}`);
+// });
 
 console.log(dbUrl);
