@@ -49,7 +49,6 @@ async function main() {
 
 
 
-
 // const dbUrl = process.env.MONGO_URI;
 // console.log("MONGO_URI =>", dbUrl);
 // main().then(() => {
@@ -107,10 +106,15 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use((req, res, next) => {
-    res.locals.currUser = req.user; // or wherever you're storing the user after login
+    res.locals.currUser = req.user;
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    res.locals.bookedDate = req.flash("bookedDate");
     next();
 });
+
 
 passport.use(new LocalStrategy(User.authenticate()));
 
@@ -131,6 +135,8 @@ passport.deserializeUser(User.deserializeUser());
 //     next();
 // })
 
+// require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 app.use((req, res, next) => {
     res.locals.currUser = req.user;
@@ -181,10 +187,7 @@ app.use("/",userRouter);
 //     res.status(statusCode).send(message);
 // });
 
-app.all("*",(req,res,next) => {
-  
-    next(new ExpressError(404,"Page Not Found!"));
-});
+
 
 app.use((err, req, res, next) => {
     // const { statusCode = 500, message = "Something went wrong" } = err;
@@ -193,6 +196,8 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs",{message});
     // res.status(statusCode).send(message);
 });
+const paymentRoutes = require('./routes/payment.js');
+app.use('/payment', paymentRoutes); // ✅ match what your controller expects
 
 
 // const port = process.env.PORT || 5000;
@@ -211,27 +216,30 @@ app.use((err, req, res, next) => {
 // app.js or main file
 app.use(flash());
 
-app.use((req, res, next) => {
-  res.locals.success = req.flash('success');
-  res.locals.bookedDate = req.flash('bookedDate');
-  res.locals.currUser = req.user; // if you're using passport
-  next();
-});
+
 
 const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
 app.use(bookingsRoutes);
 
 
-const PORT = 8000; 
+// const PORT = 6000; 
 
-app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
-});
-
-// const PORT = 0; 
-// const server = app.listen(PORT, () => {
-//     const actualPort = server.address().port;
-//     console.log(`Server is listening on port ${actualPort}`);
+// app.listen(PORT, () => {
+//   console.log(`✅ Server is running on http://localhost:${PORT}`);
 // });
+// app.all("*",(req,res,next) => {
+  
+//     next(new ExpressError(404,"Page Not Found!"));
+// });
+
+// app.get("/payments/success", (req, res) => {
+//     res.send("✅ Payment successful! Thank you.");
+// });
+
+const PORT = 0; 
+const server = app.listen(PORT, () => {
+    const actualPort = server.address().port;
+    console.log(`Server is listening on port ${actualPort}`);
+});
 
 console.log(dbUrl);

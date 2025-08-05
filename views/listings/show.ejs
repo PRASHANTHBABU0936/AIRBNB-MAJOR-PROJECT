@@ -1,17 +1,18 @@
 <% layout("layouts/boilerplate") -%>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
 <style>
   .book-now-hover {
-  transition: transform 0.2s ease-in-out;
-  font-weight: 500;
-}
-.book-now-hover:hover {
-  transform: scale(1.1);
-  background-color: #c82333;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
+    transition: transform 0.2s ease-in-out;
+    font-weight: 500;
+    height: 50px;
+  }
+
+  .book-now-hover:hover {
+    transform: scale(1.1);
+    background-color: #c82333;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
 
   .booking-alert {
     position: fixed;
@@ -27,18 +28,6 @@
     opacity: 1;
     transition: opacity 0.5s ease;
   }
-
-  .book-now-hover {
-    transition: transform 0.2s ease-in-out;
-    font-weight: 500;
-    height: 50px;
-  }
-
-  .book-now-hover:hover {
-    transform: scale(1.1);
-    background-color: #c82333;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  }
 </style>
 
 <script>
@@ -51,44 +40,53 @@
     <h3><%= listing.title %></h3>
   </div>
 
-
   <div class="card col-6 offset-3 show-card listing-card">
     <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing_image">
     <div class="card-body">
-<% if (listing.owner && listing.owner.username) { %>
-<p class="card-text mb-3 fw-bold" style="font-size: 1.1rem; transform: scale(1.03);">
-  Owned By: <i><%= listing.owner.username %></i>
-</p>
-<% } else { %>
-  <p class="card-text text-danger mb-3">Owner unknown</p>
-<% } %>
+      <% if (listing.owner && listing.owner.username) { %>
+        <p class="card-text mb-3 fw-bold" style="font-size: 1.1rem; transform: scale(1.03);">
+          Owned By: <i><%= listing.owner.username %></i>
+        </p>
+      <% } else { %>
+        <p class="card-text text-danger mb-3">Owner unknown</p>
+      <% } %>
 
-<!-- Booking form positioned to the right of the owner name block using flex container -->
-<div class="d-flex justify-content-end mb-4">
-  <form action="/listings/<%= listing._id %>/book" method="POST" class="d-flex align-items-center" style="gap: 10px;">
-    <input type="date" name="date" required class="form-control form-control-sm" style="width: 160px;">
-<button type="submit" class="btn btn-danger btn-sm book-now-hover fw-bold" style="transform: scale(1.05);">
-  Book Now
-</button>
-  </form>
+      <!-- Booking form -->
+      <div class="d-flex justify-content-end mb-4">
+        <form action="/listings/<%= listing._id %>/book" method="POST" class="d-flex align-items-center" style="gap: 10px;">
+          <input type="date" name="date" required class="form-control form-control-sm" style="width: 160px;">
+          <button type="submit" class="btn btn-danger btn-sm book-now-hover fw-bold" style="transform: scale(1.05);">
+            Book Now
+          </button>
+        </form>
+      </div>
+
+      <!-- Stripe Payment Button -->
+      <% if (!paymentInfo) { %> <!-- UPDATED -->
+        <form action="/payment/create-checkout-session/<%= listing._id %>" method="POST">
+          <button type="submit" class="btn btn-success">Pay in Advance ₹<%= listing.price.toLocaleString("en-IN") %></button> <!-- UPDATED -->
+        </form>
+      <% } else { %> <!-- UPDATED -->
+        <button class="btn btn-success" disabled>✅ Already Paid</button> <!-- UPDATED -->
+      <% } %> <!-- UPDATED -->
+
+      <% if (currUser && paymentInfo) { %> <!-- UPDATED -->
+        <p>You paid ₹<%= paymentInfo.amount.toLocaleString("en-IN") %> on <%= new Date(paymentInfo.date).toDateString() %></p> <!-- UPDATED -->
+      <% } %> <!-- UPDATED -->
+
+    </div>
+
+    <br>
+    <p class="card-text"><%= listing.description %></p><br>
+    <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %></p>
+    <p class="card-text"><%= listing.location %></p>
+    <p class="card-text"><%= listing.country %></p>
+  </div>
 </div>
 
-  </div>
+<br>
 
-
-
-
-      <br>
-      <p class="card-text"><%= listing.description %></p><br>
-      <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %></p>
-      <p class="card-text"><%= listing.location %></p>
-      <p class="card-text"><%= listing.country %></p>
-    </div>
-  </div>
-
-  <br>
-
-
+<!-- Booking Alert via SweetAlert -->
 <% if (booked === 'success' && bookedDate && currUser) { %>
   <script>
     Swal.fire({
@@ -111,21 +109,20 @@
   </script>
 <% } %>
 
-
-  <% if (bookedDate) { %>
-    <div id="booking-msg" class="booking-alert">
-      Successfully booked on <%= bookedDate %>!
-    </div>
-  <% } %>
-
-  <div class="btns">
-    <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
-    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-      <button class="btn btn-dark offset-5">Delete</button>
-    </form>
+<% if (bookedDate) { %>
+  <div id="booking-msg" class="booking-alert">
+    Successfully booked on <%= bookedDate %>!
   </div>
-<div class="col-8 offset-3 mb-3">
+<% } %>
 
+<div class="btns">
+  <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
+  <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+    <button class="btn btn-dark offset-5">Delete</button>
+  </form>
+</div>
+
+<div class="col-8 offset-3 mb-3">
   <% if (currUser) { %>
     <hr/>
     <h4>Leave a Review</h4>
@@ -153,49 +150,31 @@
   <% } %>
 
   <h3 class="mt-4">Reviews</h3>
-<% if (listing.reviews.length === 0) { %>
-  <p class="text-muted">No reviews yet.</p>
-<% } else { %>
-  <% for (let review of listing.reviews) { %>
-    <div class="card mb-2 p-2">
-      <!-- Show stars -->
-      <div class="text-warning">
-        <% for (let i = 0; i < review.rating; i++) { %>
-          ★
-        <% } %>
-        <% for (let i = review.rating; i < 5; i++) { %>
-          ☆
+  <% if (listing.reviews.length === 0) { %>
+    <p class="text-muted">No reviews yet.</p>
+  <% } else { %>
+    <% for (let review of listing.reviews) { %>
+      <div class="card mb-2 p-2">
+        <div class="text-warning">
+          <% for (let i = 0; i < review.rating; i++) { %>★<% } %>
+          <% for (let i = review.rating; i < 5; i++) { %>☆<% } %>
+        </div>
+        <p><%= review.comment %></p>
+        <small>— by <%= review.author?.username || 'Anonymous' %></small>
+
+        <% if (currUser && review.author && review.author._id.toString() === currUser._id.toString()) { %>
+          <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+            <button class="btn btn-sm btn-danger mt-1">Delete</button>
+          </form>
         <% } %>
       </div>
-
-      <!-- Comment and username -->
-      <p><%= review.comment %></p>
-      <small>— by <%= review.author?.username || 'Anonymous' %></small>
-
-      <% if (currUser && review.author && review.author._id.toString() === currUser._id.toString()) { %>
-        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-          <button class="btn btn-sm btn-danger mt-1">Delete</button>
-        </form>
-      <% } %>
-    </div>
-  <% } %>
-<% } %>
-
-
-  <button type="submit" class="btn btn-success">Submit Review</button>
-</form>
-
-    
-
-    <% if(listing.reviews.length){ %>
-
     <% } %>
-  </div>
+  <% } %>
+</div>
 
-  <div class="col-8 offset-3 mb-3">
-    <h3>Where you will be?</h3>
-    <div id="map"></div>
-  </div>
+<div class="col-8 offset-3 mb-3">
+  <h3>Where you will be?</h3>
+  <div id="map"></div>
 </div>
 
 <% if (success && success.length > 0) { %>
@@ -204,28 +183,22 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 <% } %>
-<% if (booked === 'success') { %>
-  <div id="booking-alert" class="alert alert-success">
-    Successfully booked for <%= bookedDate %>!
-  </div>
-<% } else if (booked === 'exists') { %>
-  <div id="booking-alert" class="alert alert-warning">
-    You've already booked for <%= bookedDate %>.
-  </div>
-<% } else if (booked === 'fail') { %>
-  <div id="booking-alert" class="alert alert-danger">
-    Please select a date before booking!
-  </div>
-<% } %>
 
-<script>
-  const alertBox = document.getElementById("booking-alert");
-  if (alertBox) {
-    setTimeout(() => {
-      alertBox.style.display = "none";
-    }, 2000); // stays visible for 2 seconds
-  }
-</script>
+<!-- Removed duplicated booking alert blocks (already handled above) --> <!-- UPDATED -->
+
+<!-- Removed paymentRecord block (use paymentInfo only) --> <!-- UPDATED -->
+
+<!-- Payment success SweetAlert -->
+<% if (paymentInfo && paymentInfo.success === true) { %> <!-- UPDATED -->
+  <script>
+    Swal.fire({
+      title: "Payment Successful!",
+      text: `₹<%= paymentInfo.amount %> paid on <%= new Date(paymentInfo.date).toLocaleDateString() %>`,
+      icon: "success",
+      confirmButtonText: "OK"
+    });
+  </script>
+<% } %>
 
 <script>
   window.addEventListener('DOMContentLoaded', () => {

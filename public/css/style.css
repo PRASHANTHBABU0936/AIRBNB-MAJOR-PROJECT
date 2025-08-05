@@ -5,6 +5,11 @@
   .card {
     margin-bottom: 20px;
   }
+/* @media (max-width: 768px) {
+  body {
+    background-color: yellow !important;
+  }
+} */
 
   .btn {
     font-size: 14px;
