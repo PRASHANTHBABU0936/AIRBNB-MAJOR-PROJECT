@@ -28,6 +28,8 @@ const User=require("./models/user.js");
 const listingRouter=require("./routes/listing.js");
 const reviewRouter=require("./routes/review.js");
 const userRouter=require("./routes/user.js");
+// const helmet = require("helmet");
+// app.use(helmet());
 
 
 // const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
@@ -221,7 +223,7 @@ const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
 app.use(bookingsRoutes);
 
 
-const PORT = 6000; 
+const PORT = 8000; 
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
