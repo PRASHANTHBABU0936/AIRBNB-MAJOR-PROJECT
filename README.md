@@ -1,4 +1,3 @@
-<img width="1720" height="930" alt="cropped_booking_confirmed" src="https://github.com/user-attachments/assets/01b2de43-254b-4c6f-ab00-3a9d71e256c5" /># 🏡 Rental Home Booking Web App (Airbnb-Inspired)
 
 🚀 **Just Launched:** A Full-Stack Rental Home Booking Platform  
 (Inspired by Airbnb — Built with Real-World Features & Technologies)
