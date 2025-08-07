@@ -1,4 +1,4 @@
-# 🏡 Rental Home Booking Web App (Airbnb-Inspired)
+<img width="1720" height="930" alt="cropped_booking_confirmed" src="https://github.com/user-attachments/assets/01b2de43-254b-4c6f-ab00-3a9d71e256c5" /># 🏡 Rental Home Booking Web App (Airbnb-Inspired)
 
 🚀 **Just Launched:** A Full-Stack Rental Home Booking Platform  
 (Inspired by Airbnb — Built with Real-World Features & Technologies)
@@ -96,10 +96,12 @@ Everything — from user authentication to real-time geolocation — is live and
 ---
 
 ## 📸 Screenshots (Optional)
-<img width="1920" height="1080" alt="2025-08-07" src="https://github.com/user-attachments/assets/ec9893ec-a49b-4618-951f-b6f9701d3ca9" />
-<img width="1920" height="1080" alt="2025-08-07 (1)" src="https://github.com/user-attachments/assets/7280e6d4-13cc-474c-85b3-f4dff4e6bc9c" />
-<img width="1920" height="1080" alt="2025-08-07 (2)" src="https://github.com/user-attachments/assets/e689b203-9027-4c0b-a1b0-9cc9bf383b1a" />
+![Uploading cropped_booking_confirmed.png…]()
+<img width="1720" height="930" alt="cropped_booking_confirmed" src="https://github.com/user-attachments/assets/4607dda0-8dba-4679-a107-879ce0f39d1d" />
 
+<img width="1720" height="930" alt="cropped_map_page" src="https://github.com/user-attachments/assets/02075c25-86fe-4a5e-87ba-401823d0a5f9" />
+
+<img width="1720" height="930" alt="cropped_stripe_payment" src="https://github.com/user-attachments/assets/69042452-52ac-40e7-bf43-3a40f9b9ac6d" />
 
 
 
