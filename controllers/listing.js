@@ -237,6 +237,9 @@
 // // res.redirect("/listings");
 // // };
 
+
+
+
 const Listing = require("../models/listing");
 const Payment = require("../models/payment");
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
@@ -249,9 +252,10 @@ module.exports.renderNewForm = (req, res) => {
 };
 
 module.exports.index = async (req, res) => {
-  const allListings = await Listing.find({});
+  const allListings = await Listing.find({}).sort({ _id: -1 }); // newest first
   res.render("listings/index", { allListings });
 };
+
 
 module.exports.showListing = async (req, res) => {
   const { id } = req.params;

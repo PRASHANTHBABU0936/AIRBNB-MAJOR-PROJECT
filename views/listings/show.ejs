@@ -7,13 +7,11 @@
     font-weight: 500;
     height: 50px;
   }
-
   .book-now-hover:hover {
     transform: scale(1.1);
     background-color: #c82333;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   }
-
   .booking-alert {
     position: fixed;
     top: 20px;
@@ -27,6 +25,11 @@
     z-index: 9999;
     opacity: 1;
     transition: opacity 0.5s ease;
+  }
+  #map {
+    width: 100%;
+    height: 500px;
+    border-radius: 8px;
   }
 </style>
 
@@ -51,29 +54,64 @@
         <p class="card-text text-danger mb-3">Owner unknown</p>
       <% } %>
 
-      <!-- Booking form -->
+      <!-- ✅ Booking Form -->
       <div class="d-flex justify-content-end mb-4">
         <form action="/listings/<%= listing._id %>/book" method="POST" class="d-flex align-items-center" style="gap: 10px;">
-          <input type="date" name="date" required class="form-control form-control-sm" style="width: 160px;">
+          <input type="date" id="bookingDate" name="date" required class="form-control form-control-sm" style="width: 160px;">
           <button type="submit" class="btn btn-danger btn-sm book-now-hover fw-bold" style="transform: scale(1.05);">
             Book Now
           </button>
         </form>
       </div>
 
-      <!-- Stripe Payment Button -->
-      <% if (!paymentInfo) { %> <!-- UPDATED -->
+      <script>
+        const bookedDates = <%- JSON.stringify(bookedDates || []) %>;
+        const dateInput = document.getElementById("bookingDate");
+        const today = new Date().toISOString().split("T")[0];
+        dateInput.setAttribute("min", today);
+        dateInput.addEventListener("input", () => {
+          const selected = dateInput.value;
+          if (bookedDates.includes(selected)) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Date Unavailable!',
+              text: 'This date is already booked. Please choose another one.',
+              confirmButtonText: 'Okay'
+            });
+            dateInput.value = "";
+          }
+        });
+      </script>
+
+      <!-- ✅ Stripe Payment Section (Updated for DB-based check) -->
+      <% if (!paymentInfo) { %>
         <form action="/payment/create-checkout-session/<%= listing._id %>" method="POST">
-          <button type="submit" class="btn btn-success">Pay in Advance ₹<%= listing.price.toLocaleString("en-IN") %></button> <!-- UPDATED -->
+          <button type="submit" class="btn btn-success">
+            Pay in Advance ₹<%= listing.price.toLocaleString("en-IN") %>
+          </button>
         </form>
-      <% } else { %> <!-- UPDATED -->
-        <button class="btn btn-success" disabled>✅ Already Paid</button> <!-- UPDATED -->
-      <% } %> <!-- UPDATED -->
+      <% } else { %>
+        <button class="btn btn-success" disabled>✅ Already Paid</button>
+        <p>You paid ₹<%= paymentInfo.amount.toLocaleString("en-IN") %> on <%= new Date(paymentInfo.date).toDateString() %></p>
+      <% } %>
 
-      <% if (currUser && paymentInfo) { %> <!-- UPDATED -->
-        <p>You paid ₹<%= paymentInfo.amount.toLocaleString("en-IN") %> on <%= new Date(paymentInfo.date).toDateString() %></p> <!-- UPDATED -->
-      <% } %> <!-- UPDATED -->
-
+      <!-- ✅ User Booked Dates -->
+      <% if (userBookedDates && userBookedDates.length > 0) { %>
+        <div class="alert alert-danger d-flex align-items-start mt-4 shadow-sm" role="alert">
+          <span class="me-3" style="font-size: 1.5rem;">
+            <i class="bi bi-calendar2-check-fill"></i>
+          </span>
+          <div>
+            <h6 class="alert-heading mb-1">Booking Confirmed!</h6>
+            <div>You booked this listing on:</div>
+            <ul class="mb-0 mt-2">
+              <% userBookedDates.forEach(date => { %>
+                <li><%= date %></li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+      <% } %>
     </div>
 
     <br>
@@ -86,13 +124,13 @@
 
 <br>
 
-<!-- Booking Alert via SweetAlert -->
+<!-- ✅ Booking Notifications -->
 <% if (booked === 'success' && bookedDate && currUser) { %>
   <script>
     Swal.fire({
       icon: 'success',
       title: 'Booking Confirmed!',
-      text: `🎉 Mr. <%= currUser.username %>, you booked on <%= bookedDate %>`,
+      text: `🎉 Mr. <%= currUser.username %>, your booking on <%= bookedDate %> is confirmed.`,
       confirmButtonText: 'Awesome!',
       timer: 4000,
       timerProgressBar: true
@@ -103,7 +141,7 @@
     Swal.fire({
       icon: 'warning',
       title: 'Already Booked!',
-      text: 'This date is already taken. Try another date.',
+      text: 'This date has already been taken. Please select another date.',
       confirmButtonText: 'Okay'
     });
   </script>
@@ -122,6 +160,7 @@
   </form>
 </div>
 
+<!-- ✅ Reviews Section -->
 <div class="col-8 offset-3 mb-3">
   <% if (currUser) { %>
     <hr/>
@@ -172,24 +211,14 @@
   <% } %>
 </div>
 
+<!-- ✅ Mapbox Section -->
 <div class="col-8 offset-3 mb-3">
   <h3>Where you will be?</h3>
   <div id="map"></div>
 </div>
 
-<% if (success && success.length > 0) { %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= success %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  </div>
-<% } %>
-
-<!-- Removed duplicated booking alert blocks (already handled above) --> <!-- UPDATED -->
-
-<!-- Removed paymentRecord block (use paymentInfo only) --> <!-- UPDATED -->
-
-<!-- Payment success SweetAlert -->
-<% if (paymentInfo && paymentInfo.success === true) { %> <!-- UPDATED -->
+<!-- ✅ Payment success alert -->
+<% if (paymentInfo && paymentInfo.success === true) { %>
   <script>
     Swal.fire({
       title: "Payment Successful!",
@@ -216,11 +245,3 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <script src="/js/map.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<style>
-  #map {
-    width: 100%;
-    height: 500px;
-    border-radius: 8px;
-  }
-</style>

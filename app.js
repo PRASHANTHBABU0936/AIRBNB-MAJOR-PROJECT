@@ -4,6 +4,7 @@ require('dotenv').config();
  //key value pairs
 // console.log(process.env.SECRET);
 const expressLayouts = require("express-ejs-layouts");
+const bookingsRoutes = require("./routes/bookings"); // ✅ import booking routes
 
 const express = require("express");//basic  req setup
 const app = express();//basic  req setup
@@ -199,6 +200,7 @@ app.use((err, req, res, next) => {
 });
 const paymentRoutes = require('./routes/payment.js');
 app.use('/payment', paymentRoutes); // ✅ match what your controller expects
+app.use("/bookings", bookingsRoutes); // ✅ add booking routes
 
 
 // const port = process.env.PORT || 5000;
@@ -218,12 +220,13 @@ app.use('/payment', paymentRoutes); // ✅ match what your controller expects
 app.use(flash());
 
 
+// ORIGNAL =BEFORE ADDING PROPER DUPLICATE BOOKING
+//added up with similar same 
+// const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
+// app.use(bookingsRoutes);
 
-const bookingsRoutes = require("./routes/bookings"); // adjust path as needed
-app.use(bookingsRoutes);
 
-
-const PORT = 8000; 
+const PORT = 8080; 
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
