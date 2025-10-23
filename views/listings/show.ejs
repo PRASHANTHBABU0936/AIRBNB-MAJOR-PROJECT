@@ -47,84 +47,96 @@
     <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing_image">
     <div class="card-body">
       <% if (listing.owner && listing.owner.username) { %>
-        <p class="card-text mb-3 fw-bold" style="font-size: 1.1rem; transform: scale(1.03);">
-          Owned By: <i><%= listing.owner.username %></i>
-        </p>
+        <p class="card-text mb-3 fw-bold" style="font-size: 1.1rem;">Owned By: <i><%= listing.owner.username %></i></p>
       <% } else { %>
         <p class="card-text text-danger mb-3">Owner unknown</p>
       <% } %>
 
-      <!-- ✅ Booking Form -->
-      <div class="d-flex justify-content-end mb-4">
-        <form action="/listings/<%= listing._id %>/book" method="POST" class="d-flex align-items-center" style="gap: 10px;">
-          <input type="date" id="bookingDate" name="date" required class="form-control form-control-sm" style="width: 160px;">
-          <button type="submit" class="btn btn-danger btn-sm book-now-hover fw-bold" style="transform: scale(1.05);">
-            Book Now
-          </button>
-        </form>
-      </div>
+<!-- ✅ Booking Form -->
+<div class="d-flex justify-content-end mb-4">
+  <form action="/listings/<%= listing._id %>/book" method="POST" class="d-flex align-items-center" style="gap: 10px;">
+    <input type="date" id="bookingDate" name="date" required class="form-control form-control-sm" style="width: 160px;">
+    <button type="submit" class="btn btn-danger btn-sm book-now-hover fw-bold">Book Now</button>
+  </form>
+</div>
 
-      <script>
-        const bookedDates = <%- JSON.stringify(bookedDates || []) %>;
-        const dateInput = document.getElementById("bookingDate");
-        const today = new Date().toISOString().split("T")[0];
-        dateInput.setAttribute("min", today);
-        dateInput.addEventListener("input", () => {
-          const selected = dateInput.value;
-          if (bookedDates.includes(selected)) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Date Unavailable!',
-              text: 'This date is already booked. Please choose another one.',
-              confirmButtonText: 'Okay'
-            });
-            dateInput.value = "";
-          }
-        });
-      </script>
+<script>
+  const bookedDates = <%- JSON.stringify(bookedDates || []) %>;
+  const dateInput = document.getElementById("bookingDate");
+  const today = new Date().toISOString().split("T")[0];
+  dateInput.setAttribute("min", today);
 
-      <!-- ✅ Stripe Payment Section (Updated for DB-based check) -->
-      <% if (!paymentInfo) { %>
-        <form action="/payment/create-checkout-session/<%= listing._id %>" method="POST">
-          <button type="submit" class="btn btn-success">
-            Pay in Advance ₹<%= listing.price.toLocaleString("en-IN") %>
-          </button>
-        </form>
-      <% } else { %>
-        <button class="btn btn-success" disabled>✅ Already Paid</button>
-        <p>You paid ₹<%= paymentInfo.amount.toLocaleString("en-IN") %> on <%= new Date(paymentInfo.date).toDateString() %></p>
+  dateInput.addEventListener("input", () => {
+    const selected = dateInput.value;
+    if (bookedDates.includes(selected)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Date Unavailable!',
+        text: 'This date is already booked. Please choose another one.',
+        confirmButtonText: 'Okay'
+      });
+      dateInput.value = "";
+    }
+  });
+</script>
+
+<!-- ✅ Payment Section -->
+<!-- ✅ Payment Section -->
+<% if (currUser) { %>
+  <% 
+    // Find if the user has already paid for this listing
+    const userPayment = paymentInfo; // fetched from DB in route handler
+  %>
+
+  <% if (!userPayment) { %>
+    <form action="/payment/create-checkout-session/<%= listing._id %>" method="POST">
+      <button type="submit" class="btn btn-success">
+        Pay in Advance ₹<%= listing.price.toLocaleString("en-IN") %>
+      </button>
+    </form>
+  <% } else { %>
+    <button class="btn btn-success" disabled>✅ Already Paid</button>
+    <p>You paid ₹<%= userPayment.amount.toLocaleString("en-IN") %> on <%= new Date(userPayment.date).toDateString() %></p>
+  <% } %>
+<% } else { %>
+  <p class="text-muted">Log in to pay and book.</p>
+<% } %>
+
+
+<!-- ✅ User’s Bookings (Persistent) -->
+<% if (userBookedDates && userBookedDates.length > 0) { %>
+  <div class="alert alert-success d-flex align-items-start mt-4 shadow-sm" role="alert">
+    <span class="me-3" style="font-size: 1.5rem;">
+      <i class="bi bi-calendar2-check-fill"></i>
+    </span>
+    <div>
+      <h6 class="alert-heading mb-1">Booking Confirmed!</h6>
+      <div>You booked this listing on:</div>
+      <ul class="mb-0 mt-2">
+        <% userBookedDates.forEach(date => { %>
+          <li><%= new Date(date).toISOString().split("T")[0] %></li>
+        <% }) %>
+      </ul>
+      <% if (paymentInfo) { %>
+        <hr>
+        <div>💳 You paid ₹<%= paymentInfo.amount.toLocaleString("en-IN") %> on <%= new Date(paymentInfo.date).toDateString() %></div>
       <% } %>
+    </div>
+  </div>
+<% } %>
 
-      <!-- ✅ User Booked Dates -->
-      <% if (userBookedDates && userBookedDates.length > 0) { %>
-        <div class="alert alert-danger d-flex align-items-start mt-4 shadow-sm" role="alert">
-          <span class="me-3" style="font-size: 1.5rem;">
-            <i class="bi bi-calendar2-check-fill"></i>
-          </span>
-          <div>
-            <h6 class="alert-heading mb-1">Booking Confirmed!</h6>
-            <div>You booked this listing on:</div>
-            <ul class="mb-0 mt-2">
-              <% userBookedDates.forEach(date => { %>
-                <li><%= date %></li>
-              <% }) %>
-            </ul>
-          </div>
-        </div>
-      <% } %>
     </div>
 
     <br>
-    <p class="card-text"><%= listing.description %></p><br>
+    <p class="card-text"><%= listing.description %></p>
     <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %></p>
     <p class="card-text"><%= listing.location %></p>
     <p class="card-text"><%= listing.country %></p>
   </div>
 </div>
 
-<br>
 
-<!-- ✅ Booking Notifications -->
+<!-- ✅ Sweet Alerts for New Booking -->
 <% if (booked === 'success' && bookedDate && currUser) { %>
   <script>
     Swal.fire({
@@ -141,17 +153,28 @@
     Swal.fire({
       icon: 'warning',
       title: 'Already Booked!',
-      text: 'This date has already been taken. Please select another date.',
+      text: 'This date has already been taken. Please select another one.',
       confirmButtonText: 'Okay'
     });
   </script>
 <% } %>
 
 <% if (bookedDate) { %>
-  <div id="booking-msg" class="booking-alert">
-    Successfully booked on <%= bookedDate %>!
-  </div>
+  <div id="booking-msg" class="booking-alert">Successfully booked on <%= bookedDate %>!</div>
 <% } %>
+
+<script>
+  // Fade out booking message after a few seconds
+  window.addEventListener('DOMContentLoaded', () => {
+    const msg = document.getElementById('booking-msg');
+    if (msg) {
+      setTimeout(() => {
+        msg.style.opacity = '0';
+        setTimeout(() => msg.remove(), 500);
+      }, 3000);
+    }
+  });
+</script>
 
 <div class="btns">
   <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
@@ -192,7 +215,7 @@
   <% if (listing.reviews.length === 0) { %>
     <p class="text-muted">No reviews yet.</p>
   <% } else { %>
-    <% for (let review of listing.reviews) { %>
+    <% listing.reviews.forEach(review => { %>
       <div class="card mb-2 p-2">
         <div class="text-warning">
           <% for (let i = 0; i < review.rating; i++) { %>★<% } %>
@@ -207,17 +230,16 @@
           </form>
         <% } %>
       </div>
-    <% } %>
+    <% }) %>
   <% } %>
 </div>
 
-<!-- ✅ Mapbox Section -->
+<!-- ✅ Map -->
 <div class="col-8 offset-3 mb-3">
   <h3>Where you will be?</h3>
   <div id="map"></div>
 </div>
 
-<!-- ✅ Payment success alert -->
 <% if (paymentInfo && paymentInfo.success === true) { %>
   <script>
     Swal.fire({

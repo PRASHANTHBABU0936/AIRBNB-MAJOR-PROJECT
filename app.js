@@ -106,6 +106,11 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 app.use(flash());
 
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -118,10 +123,7 @@ app.use((req, res, next) => {
 });
 
 
-passport.use(new LocalStrategy(User.authenticate()));
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 
 // app.use((req, res, next) => {
 //     res.locals.currUser = req.user;  // assuming you're using Passport and req.user is available
@@ -217,7 +219,7 @@ app.use("/bookings", bookingsRoutes); // ✅ add booking routes
 
 // make sure you have this
 // app.js or main file
-app.use(flash());
+// app.use(flash());
 
 
 // ORIGNAL =BEFORE ADDING PROPER DUPLICATE BOOKING

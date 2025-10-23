@@ -178,25 +178,15 @@ module.exports.successPage = async (req, res) => {
         }
 
         // ✅ Check if payment already exists to avoid duplicates
-        const existingPayment = await Payment.findOne({
-            user: req.user._id,
-            listing: listing._id
-        });
+ // ✅ Always save a new payment
+const payment = new Payment({
+    user: req.user._id,
+    listing: listing._id,
+    amount: amount,
+    date: new Date()
+});
+await payment.save();
 
-        if (!existingPayment) {
-            // ✅ Save payment in DB
-            const payment = new Payment({
-                user: req.user._id,      // matches schema
-                listing: listing._id,    // matches schema
-                amount: amount,
-                date: new Date()
-            });
-            await payment.save();
-            // console.log("✅ Payment saved:", payment);
-
-        }
-
-        // ✅ Set session info for front-end popup
         req.session.paymentInfo = {
             listingId,
             success: true,
